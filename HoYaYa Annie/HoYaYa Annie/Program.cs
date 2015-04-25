@@ -24,7 +24,7 @@ namespace Aprendendo
         public static Spell R;
         public static Menu _menu;
         private static Obj_AI_Hero Player;
-
+        
 
         static void Main(string[] args)
         {
@@ -54,11 +54,31 @@ namespace Aprendendo
             TargetSelector.AddToMenu(targetSelectorMenu);
             _menu.AddSubMenu(targetSelectorMenu);
 
-            _menu.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
+            _menu.AddSubMenu(new Menu("Orbwalker", "orbwalker"));
+            _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
+            var comboMenu = new Menu("Combo", "combo_menu");
+            comboMenu.AddItem(new MenuItem("qcombo", "(Q) Combo").SetValue(true));
+            comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
+            _menu.AddSubMenu(comboMenu);
 
+            _menu.AddToMainMenu();
 
         }
+        public static void Game_OnGameUpdate(EventArgs args)
+        {
+            switch (_orbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo:
+                    Combo();
+                    break;
+            }
+        }
+
+            private static void Combo()
+            {
+
+            }
     }
 }
 
