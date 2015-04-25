@@ -24,6 +24,7 @@ namespace YaYaAnnie
         public static Spell R;
         public static Menu _menu;
         private static Obj_AI_Hero Player;
+
         
 
         static void Main(string[] args)
@@ -33,6 +34,7 @@ namespace YaYaAnnie
 
         private static void Game_OnGameLoad(EventArgs args)
         {
+            Game.OnUpdate += Game_OnGameUpdate;
             Player = ObjectManager.Player;
 
             Q = new Spell(SpellSlot.Q, 625f);
@@ -58,14 +60,21 @@ namespace YaYaAnnie
             _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
             var comboMenu = new Menu("Combo", "combo_menu");
+            comboMenu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(true));
             comboMenu.AddItem(new MenuItem("qcombo", "(Q) Combo").SetValue(true));
             comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
             _menu.AddSubMenu(comboMenu);
 
             _menu.AddToMainMenu();
 
+            
+
         }
-        public static void Game_OnGameUpdate(EventArgs args)
+
+
+
+        private static void Game_OnGameUpdate(EventArgs args)
+
         {
             switch (_orbwalker.ActiveMode)
             {
@@ -77,7 +86,17 @@ namespace YaYaAnnie
 
             private static void Combo()
             {
+                var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+                
+                {
+                    if (_menu.Item("combofull").GetValue<bool>());
+                    {
+                        Q.Cast(true);
+                        W.Cast(true);
 
+                      }
+                 
+                }
             }
     }
 }
