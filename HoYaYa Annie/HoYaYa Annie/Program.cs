@@ -14,6 +14,7 @@ namespace YaYaAnnie
 {
     class Program
     {
+        #region
 
         public const string ChampionName = "Annie";
         public static Orbwalking.Orbwalker _orbwalker;
@@ -22,10 +23,12 @@ namespace YaYaAnnie
         public static Spell W;
         public static Spell E;
         public static Spell R;
+        public static SpellSlot Ignite;
+        public static SpellSlot Flash;
         public static Menu _menu;
         private static Obj_AI_Hero Player;
+        #endregion
 
-        
 
         static void Main(string[] args)
         {
