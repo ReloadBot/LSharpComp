@@ -20,16 +20,42 @@ namespace YaYaAnnie //By Silva & iPobre
         public const string ChampionName = "Annie";
         public static Orbwalking.Orbwalker _orbwalker;
         public static List<Spell> SpellList = new List<Spell>();
+        public static readonly List<SpellSlot> _SumList = new List<SpellSlot>();
         public static Spell Q;
         public static Spell W;
         public static Spell E;
         public static Spell R;
+        public static Spell R1;
         public static SpellSlot Ignite;
         public static SpellSlot Flash;
         public static Menu _menu;
         private static Obj_AI_Hero Player;
+        private static Obj_AI_Base _Tibbers;
         
 
+        #endregion
+
+        #region Buff
+        public static int StunCount
+        {
+            get
+            {
+                foreach (var buff in
+                    ObjectManager.Player.Buffs.Where(
+                        buff => buff.Name == "pyromania" || buff.Name == "pyromania_particle"))
+                {
+                    switch (buff.Name)
+                    {
+                        case "pyromania":
+                            return buff.Count;
+                        case "pyromania_particle":
+                            return 4;
+                    }
+                }
+
+                return 0;
+            }
+        }
         #endregion
 
 
@@ -46,21 +72,30 @@ namespace YaYaAnnie //By Silva & iPobre
 
             #region Create Spells
 
-            Q = new Spell(SpellSlot.Q, 650);
-            Q.SetTargetted(0.25f, 1400);
+            Q = new Spell(SpellSlot.Q, 625f);
+            Q.SetTargetted(0.15f, 1500f);
 
-            W = new Spell(SpellSlot.W, 625);
-            W.SetSkillshot(0.6f, (float)(50 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
+            W = new Spell(SpellSlot.W, 610f);
+            W.SetSkillshot(0.15f, 75f, 1500f, false, SkillshotType.SkillshotCone);
 
             E = new Spell(SpellSlot.E);
 
-            R = new Spell(SpellSlot.R, 600);
-            R.SetSkillshot(0.25f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R = new Spell(SpellSlot.R, 625);
+            R.SetSkillshot(0.15f, 75f, 1500f, false, SkillshotType.SkillshotCircle);
+
+            R1 = new Spell(SpellSlot.Unknown, 400f);
+            R1.SetSkillshot(0.15f, 75f, 1500f, false, SkillshotType.SkillshotCircle);
+
+            Ignite = Player.GetSpellSlot("SummonerDot");
+            Flash = Player.GetSpellSlot("SummonerFlash");
 
             SpellList.Add(Q);
             SpellList.Add(W);
             SpellList.Add(E);
             SpellList.Add(R);
+            SpellList.Add(R1);
+            _SumList.Add(Ignite);
+            _SumList.Add(Flash);
             #endregion
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -105,6 +140,11 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "Drawings on HPBar").SetValue(true));
 
+            _menu.AddSubMenu(new Menu("Passive in Base", "load.fast.stun.base"));
+            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.enabled", "Load Enabled").SetValue(true));
+            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.w", "Cast W").SetValue(true));
+            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.e", "Cast E").SetValue(true));
+
 
             _menu.AddToMainMenu();
 
@@ -127,8 +167,20 @@ namespace YaYaAnnie //By Silva & iPobre
                     LaneClear();
                     break;
             }
+
+            // Passive in Base 
+            if (_menu.Item("load.fast.enabled").GetValue<bool>() && ObjectManager.Player.InFountain() && StunCount != 4)
+            {
+                if (W.IsReady() || E.IsReady())
+                {
+                    if (_menu.Item("load.fast.cast.w").GetValue<bool>()) { W.Cast(Player.Position, false); }
+                    if (_menu.Item("load.fast.cast.e").GetValue<bool>()) { E.Cast(); }
+                }
+            }
+
         }
-            
+
+          
         private static void LaneClear()
         {
 
@@ -136,6 +188,8 @@ namespace YaYaAnnie //By Silva & iPobre
 
             }
         }
+
+
        
         private static void Combo()
             {
@@ -152,37 +206,53 @@ namespace YaYaAnnie //By Silva & iPobre
                     }
                     if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy <= minenemy) && R.IsReady())
                     {
-                        R.Cast(target, false,false);
+                        R.Cast(rtarget, false,false);
                     }
                 }
 
             }
         private static void FlashCombo()
         {
-            var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+
+            if (StunCount == 4 && R.IsReady() && Q.IsReady() && W.IsReady() && target != null)
             {
-                if (_menu.Item("FlashCombo").GetValue<bool>())
-                if (ObjectManager.Player.GetSpellSlot("SummonerFlash").IsReady())
+
+                if (_menu.Item("FlashCombo").GetValue<bool>() && StunCount == 4 && R.IsReady() && _Tibbers == null)
                 {
-                     
+                    ObjectManager.Player.Spellbook.CastSpell(Flash, R1.GetPrediction(target, true).UnitPosition);
                 }
+                R.CastOnUnit(target, false);
+                Q.CastOnUnit(target, false);
+                W.CastOnUnit(target, false);
+                _orbwalker.SetAttack(true);
+                Player.IssueOrder(GameObjectOrder.AutoAttackPet, target);
+
+
+            }
+        }
+
+        public static bool CastIncendiar(Obj_AI_Base _target)
+        {
+            if (_target == null) return false;
+            int _dmg_Incediar_Base = 50 + (Player.Level * 20);
+
+            if (_target.Health <= _dmg_Incediar_Base)
+            {
+                return true;
+            }
+            else if (_target.Health == _dmg_Incediar_Base)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         
 
-            public static int GetPassiveStacks()
-            {
-                var buffs = Player.Buffs.Where(buff => (buff.Name.ToLower() == "pyromania" || buff.Name.ToLower() == "pyromania_particle"));
-                if (buffs.Any())
-                {
-                    var buff = buffs.First();
-                    if (buff.Name.ToLower() == "pyromania_particle")
-                        return 4;
-                    else
-                        return buff.Count;
-                }
-                return 0;
-            }
+           
 
 
             #region Drawing
