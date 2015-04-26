@@ -70,6 +70,13 @@ namespace YaYaAnnie //By Silva & iPobre
         private static void Game_OnGameLoad(EventArgs args)
         {
 
+            if (Player.ChampionName != ChampionName)
+            {
+
+                Game.PrintChat(string.Format("<font color='#736AFF'>HoYaYa Annie</font> <font color='#00FF00'>Loaded</font> Created by: Silva & iPobre"));
+
+            }
+
             #region Create Spells
 
             Q = new Spell(SpellSlot.Q, 625f);
@@ -102,12 +109,7 @@ namespace YaYaAnnie //By Silva & iPobre
             Drawing.OnDraw += Drawing_OnDraw;
             Player = ObjectManager.Player;
 
-            if (Player.ChampionName != ChampionName)
-            {
-
-                Game.PrintChat(string.Format("<font color='#736AFF'>HoYaYa Annie</font> <font color='#00FF00'>Loaded</font> Created by: Silva & iPobre"));
-                                           
-            }
+            
             
 
             
