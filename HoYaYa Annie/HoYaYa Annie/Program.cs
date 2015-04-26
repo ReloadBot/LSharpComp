@@ -70,10 +70,10 @@ namespace YaYaAnnie //By Silva & iPobre
             if (Player.ChampionName != ChampionName)
             {
 
-                Game.PrintChat(string.Format("<font color='#736AFF'>HoYaYa Annie</font> <font color='#00FF00'>Loaded</font> \n Created by: Silva & iPobre"));
-                return;                           
+                Game.PrintChat(string.Format("<font color='#736AFF'>HoYaYa Annie</font> <font color='#00FF00'>Loaded</font> Created by: Silva & iPobre"));
+                                           
             }
-             
+            
 
             
 
@@ -140,6 +140,8 @@ namespace YaYaAnnie //By Silva & iPobre
         private static void Combo()
             {
                 var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+                var minenemy = _menu.Item("rcombo").GetValue<Slider>().Value;
+                var rtarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 
                 {
                     if (_menu.Item("combofull").GetValue<KeyBind>().Active)
@@ -148,10 +150,6 @@ namespace YaYaAnnie //By Silva & iPobre
                         W.Cast(target, false, false);
                         
                     }
-
-                    var minenemy = _menu.Item("rcombo").GetValue<Slider>().Value;
-                    var rtarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-
                     if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy <= minenemy) && R.IsReady())
                     {
                         R.Cast(target, false,false);
@@ -163,9 +161,10 @@ namespace YaYaAnnie //By Silva & iPobre
         {
             var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             {
-                if (_menu.Item("FlashCombo").GetValue<bool>())              
+                if (_menu.Item("FlashCombo").GetValue<bool>())
+                if (ObjectManager.Player.GetSpellSlot("SummonerFlash").IsReady())
                 {
-                    
+                     
                 }
             }
         }
