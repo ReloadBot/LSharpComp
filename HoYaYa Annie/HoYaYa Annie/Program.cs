@@ -29,7 +29,7 @@ namespace YaYaAnnie //By Silva & iPobre
         public static SpellSlot Ignite;
         public static SpellSlot Flash;
         public static Menu _menu;
-        private static Obj_AI_Hero Player;
+        public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static Obj_AI_Base _Tibbers;
         
 
@@ -69,13 +69,7 @@ namespace YaYaAnnie //By Silva & iPobre
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-
-            if (Player.ChampionName != ChampionName)
-            {
-
-                Game.PrintChat(string.Format("<font color='#736AFF'>HoYaYa Annie</font> <font color='#00FF00'>Loaded</font> Created by: Silva & iPobre"));
-
-            }
+            if (Player.BaseSkinName != "Annie") { return; }
 
             #region Create Spells
 
@@ -107,14 +101,8 @@ namespace YaYaAnnie //By Silva & iPobre
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Player = ObjectManager.Player;
-
-            
-            
-
-            
-
-
+            Game.PrintChat("<font color=''>HoYaYa Annie</font color> <font color=''>Loaded!</font> \n Made by: Silva & iPobre");
+           
            
             _menu = new Menu(ChampionName, ChampionName, true);
 
@@ -127,9 +115,9 @@ namespace YaYaAnnie //By Silva & iPobre
 
             var comboMenu = new Menu("Combo", "combo_menu");
             comboMenu.AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
-            comboMenu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Toggle)));
+            comboMenu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
            
-           comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
+            comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
             _menu.AddSubMenu(comboMenu);
 
             var FarmMenu = new Menu("Farming", "farming_menu");
@@ -206,7 +194,7 @@ namespace YaYaAnnie //By Silva & iPobre
                         W.Cast(target, false, false);
                         
                     }
-                    if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy <= minenemy) && R.IsReady())
+                    if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy >= 1) && R.IsReady())
                     {
                         R.Cast(rtarget, false,false);
                     }
@@ -253,9 +241,6 @@ namespace YaYaAnnie //By Silva & iPobre
             }
         }
         
-
-           
-
 
             #region Drawing
             static void Drawing_OnDraw(EventArgs args)
