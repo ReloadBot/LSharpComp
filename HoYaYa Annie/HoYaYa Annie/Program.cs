@@ -101,9 +101,11 @@ namespace YaYaAnnie //By Silva & iPobre
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Game.PrintChat("<font color=''>HoYaYa Annie</font color> <font color=''>Loaded!</font> \n Made by: Silva & iPobre");
            
-           
+            #region Menu
             _menu = new Menu(ChampionName, ChampionName, true);
 
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
@@ -122,6 +124,9 @@ namespace YaYaAnnie //By Silva & iPobre
 
             var FarmMenu = new Menu("Farming", "farming_menu");
             FarmMenu.AddItem(new MenuItem("qfarm", "Farm With (Q)").SetValue(true));
+            
+            var FarmMenu = new Menu("GapCloser", "gapping");
+            FarmMenu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
 
             _menu.AddSubMenu(new Menu("Drawings", "Drawings"));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
@@ -138,7 +143,18 @@ namespace YaYaAnnie //By Silva & iPobre
 
             _menu.AddToMainMenu();
 
+            #endregion
             
+            private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+            
+        {
+            // use Q against gap closer
+            var target = gapcloser.Sender;
+            if (Q.IsReady() && StunCount == 4 && _menu.Item("Anti GapCloser").GetValue<bool>())
+            {
+                Q.Cast(target);
+            }
+        }
 
         }
 
