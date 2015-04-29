@@ -100,11 +100,11 @@ namespace YaYaAnnie //By Silva & iPobre
             #endregion
 
             Game.OnUpdate += Game_OnGameUpdate;
-            Drawing.OnDraw += Drawing_OnDraw;
-           
-            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Drawing.OnDraw += Drawing_OnDraw;                     
             Game.PrintChat("<font color='#ab82ff'>HoYaYa Annie</font color> <font color='#6dc066'>Loaded!</font> \n Made by: Silva & iPobre");
            
+
+
             #region Menu
             _menu = new Menu(ChampionName, ChampionName, true);
 
@@ -122,13 +122,13 @@ namespace YaYaAnnie //By Silva & iPobre
             comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
             _menu.AddSubMenu(comboMenu);
 
-            _menu.AddSubMenu(new Menu("Farming", "farmstyle"));
-            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
-            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("farmw", "Use W Lane Clear").SetValue(false));
-            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("notfarmstun", "Not Spell WHEN Stun").SetValue(true));
-            
-            var GapMenu = new Menu("GapCloser", "gapping");
-            GapMenu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
+            _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
+            _menu.AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
+            _menu.AddItem(new MenuItem("farmw", "Use W Lane Clear").SetValue(false));
+            _menu.AddItem(new MenuItem("notfarmstun", "Not Spell WHEN Stun").SetValue(true));
+
+            _menu.AddSubMenu(new Menu("Anti GapCloser", "gapcloser"));
+            _menu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
 
             _menu.AddSubMenu(new Menu("Drawings", "Drawings"));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
@@ -143,22 +143,27 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.e", "Cast E").SetValue(true));
 
 
-            _menu.AddToMainMenu();
+            _menu.AddToMainMenu(); 
+
+
+        }
+
+
+
 
             #endregion
-            
-            private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-            
+
+        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             // use Q against gap closer
             var target = gapcloser.Sender;
-            if (Q.IsReady() && StunCount == 4 && GapMenu.Item("qgap").GetValue<bool>())
+            if (Q.IsReady() && StunCount == 4 && _menu.Item("qgap").GetValue<bool>())
             {
                 Q.Cast(target);
             }
         }
-
-        }
+    
+           
 
 
 
@@ -189,21 +194,21 @@ namespace YaYaAnnie //By Silva & iPobre
         }
 
           
-    public static void LaneClear(bool FarmMod)
+    public static void LaneClear()
         {
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range);
             var jungleMinions = MinionManager.GetMinions(
                 ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral);
             minions.AddRange(jungleMinions);
-            if (StunCount == 4 && FarmMenu.Item("notfarmstun").GetValue<bool>()) { return; }
+            if (StunCount == 4 && _menu.Item("notfarmstun").GetValue<bool>()) { return; }
 
-            if (FarmMenu.Item("farmw").GetValue<bool>() && FarmMod == true && W.IsReady() && minions.Count != 0)
+            if (_menu.Item("farmw").GetValue<bool>() && W.IsReady() && minions.Count != 0)
             {
                 W.Cast(W.GetLineFarmLocation(minions).Position);
             }
             
             
-            else if (FarmMenu.Item("farmq").GetValue<bool>() && Q.IsReady() && minions.Count >= 0)
+            else if (_menu.Item("farmq").GetValue<bool>() && Q.IsReady() && minions.Count >= 0)
             {
                 foreach (var minion in
                 from minion in
@@ -215,7 +220,7 @@ namespace YaYaAnnie //By Silva & iPobre
                     predictedHealth > 0
                 select minion)
                 {
-                    Q.CastOnUnit(minion, FarmMenu.Item("farmq").GetValue<bool>());
+                    Q.CastOnUnit(minion, _menu.Item("farmq").GetValue<bool>());
                 }
             }
 
@@ -264,7 +269,7 @@ namespace YaYaAnnie //By Silva & iPobre
             }
         }
 
-        public static bool CastIncendiar(Obj_AI_Base _target)
+        public static bool CastIncendiar(Obj_AI_Base target)
         {
             if (target == null) return false;
             int _dmg_Incediar_Base = 50 + (Player.Level * 20);
@@ -282,6 +287,8 @@ namespace YaYaAnnie //By Silva & iPobre
                 return false;
             }
         }
+
+
         
 
             #region Drawing
@@ -298,6 +305,10 @@ namespace YaYaAnnie //By Silva & iPobre
 
             }
             #endregion
+
+        
+
+        
             
             
     }
