@@ -266,14 +266,14 @@ namespace YaYaAnnie //By Silva & iPobre
 
         public static bool CastIncendiar(Obj_AI_Base _target)
         {
-            if (_target == null) return false;
+            if (target == null) return false;
             int _dmg_Incediar_Base = 50 + (Player.Level * 20);
 
-            if (_target.Health <= _dmg_Incediar_Base)
+            if (target.Health <= _dmg_Incediar_Base)
             {
                 return true;
             }
-            else if (_target.Health == _dmg_Incediar_Base)
+            else if (target.Health == _dmg_Incediar_Base)
             {
                 return true;
             }
