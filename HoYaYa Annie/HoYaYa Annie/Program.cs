@@ -127,6 +127,8 @@ namespace YaYaAnnie //By Silva & iPobre
 
             _menu.AddSubMenu(new Menu("Anti GapCloser", "gapcloser"));
             _menu.SubMenu("gapcloser").AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
+            _menu.SubMenu("gapcloser").AddItem(new MenuItem("egap", "Use (E) When Gapclosed").SetValue(true));
+
 
             _menu.AddSubMenu(new Menu("Drawings", "Drawings"));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
@@ -158,6 +160,10 @@ namespace YaYaAnnie //By Silva & iPobre
             if (Q.IsReady() && StunCount == 4 && _menu.Item("qgap").GetValue<bool>())
             {
                 Q.Cast(target);
+            }
+            if (E.IsReady() && _menu.Item("egap").GetValue<bool>())
+            {
+                E.Cast();
             }
         }
     
