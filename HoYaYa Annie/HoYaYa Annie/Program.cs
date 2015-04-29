@@ -116,17 +116,17 @@ namespace YaYaAnnie //By Silva & iPobre
             _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
-            _menu.AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
-            _menu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
-            _menu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3, 0, 5)));
+            _menu.SubMenu("combo").AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
+            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3, 0, 5)));
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
-            _menu.AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
-            _menu.AddItem(new MenuItem("farmw", "Use W Lane Clear").SetValue(false));
-            _menu.AddItem(new MenuItem("notfarmstun", "Not Spell WHEN Stun").SetValue(true));
+            _menu.SubMenu("Farm.mode").AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
+            _menu.SubMenu("Farm.mode").AddItem(new MenuItem("farmw", "Use W Lane Clear").SetValue(false));
+            _menu.SubMenu("Farm.mode").AddItem(new MenuItem("notfarmstun", "Not Spell WHEN Stun").SetValue(true));
 
             _menu.AddSubMenu(new Menu("Anti GapCloser", "gapcloser"));
-            _menu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
+            _menu.SubMenu("gapcloser").AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
 
             _menu.AddSubMenu(new Menu("Drawings", "Drawings"));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
