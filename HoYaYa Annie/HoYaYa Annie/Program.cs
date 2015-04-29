@@ -103,7 +103,7 @@ namespace YaYaAnnie //By Silva & iPobre
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Game.PrintChat("<font color=''>HoYaYa Annie</font color> <font color=''>Loaded!</font> \n Made by: Silva & iPobre");
+            Game.PrintChat("<font color='#ab82ff'>HoYaYa Annie</font color> <font color='#6dc066'>Loaded!</font> \n Made by: Silva & iPobre");
            
             #region Menu
             _menu = new Menu(ChampionName, ChampionName, true);
