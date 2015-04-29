@@ -115,12 +115,10 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.AddSubMenu(new Menu("Orbwalker", "orbwalker"));
             _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
-            var comboMenu = new Menu("Combo", "combo_menu");
-            comboMenu.AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
-            comboMenu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
-           
-            comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
-            _menu.AddSubMenu(comboMenu);
+            _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
+            _menu.AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
+            _menu.AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
+            _menu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3, 0, 5)));
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
             _menu.AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
