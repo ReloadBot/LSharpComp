@@ -122,11 +122,13 @@ namespace YaYaAnnie //By Silva & iPobre
             comboMenu.AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3,0,5)));
             _menu.AddSubMenu(comboMenu);
 
-            var FarmMenu = new Menu("Farming", "farming_menu");
-            FarmMenu.AddItem(new MenuItem("qfarm", "Farm With (Q)").SetValue(true));
+            _menu.AddSubMenu(new Menu("Farming", "farmstyle"));
+            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
+            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("farmw", "Use W Lane Clear").SetValue(false));
+            FarmMenu.SubMenu("Farming").AddItem(new MenuItem("notfarmstun", "Not Spell WHEN Stun").SetValue(true));
             
-            var FarmMenu = new Menu("GapCloser", "gapping");
-            FarmMenu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
+            var GapMenu = new Menu("GapCloser", "gapping");
+            GapMenu.AddItem(new MenuItem("qgap", "Evite Gap with (Q)").SetValue(true));
 
             _menu.AddSubMenu(new Menu("Drawings", "Drawings"));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
@@ -191,7 +193,36 @@ namespace YaYaAnnie //By Silva & iPobre
         {
 
             {
+    
+    public static void LaneClear(bool FarmMod)
+        {
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range);
+            var jungleMinions = MinionManager.GetMinions(
+                ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral);
+            minions.AddRange(jungleMinions);
+            if (StunCount == 4 && FarmMenu.Item("notfarmstun").GetValue<bool>()) { return; }
 
+            if (FarmMenu.Item("farmw").GetValue<bool>() && FarmMod == true && W.IsReady() && minions.Count != 0)
+            {
+                W.Cast(W.GetLineFarmLocation(minions).Position);
+            }
+            else if (FarmMenu.Item("farmq").GetValue<bool>() && Q.IsReady() && minions.Count >= 0)
+            {
+                foreach (var minion in
+                from minion in
+                    minions.OrderByDescending(Minions => Minions.MaxHealth)
+                        .Where(minion => minion.IsValidTarget(Q.Range))
+                let predictedHealth = Q.GetHealthPrediction(minion)
+                where
+                    predictedHealth < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q) * 0.85 &&
+                    predictedHealth > 0
+                select minion)
+                {
+                    Q.CastOnUnit(minion, FarmMenu.Item("useq").GetValue<bool>());
+                }
+            }
+
+        }
             }
         }
 
