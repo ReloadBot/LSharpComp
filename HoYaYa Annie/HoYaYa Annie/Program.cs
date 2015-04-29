@@ -152,7 +152,7 @@ namespace YaYaAnnie //By Silva & iPobre
         {
             // use Q against gap closer
             var target = gapcloser.Sender;
-            if (Q.IsReady() && StunCount == 4 && _menu.Item("qgap").GetValue<bool>())
+            if (Q.IsReady() && StunCount == 4 && GapMenu.Item("qgap").GetValue<bool>())
             {
                 Q.Cast(target);
             }
@@ -189,11 +189,6 @@ namespace YaYaAnnie //By Silva & iPobre
         }
 
           
-        private static void LaneClear()
-        {
-
-            {
-    
     public static void LaneClear(bool FarmMod)
         {
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range);
@@ -206,6 +201,8 @@ namespace YaYaAnnie //By Silva & iPobre
             {
                 W.Cast(W.GetLineFarmLocation(minions).Position);
             }
+            
+            
             else if (FarmMenu.Item("farmq").GetValue<bool>() && Q.IsReady() && minions.Count >= 0)
             {
                 foreach (var minion in
@@ -218,12 +215,10 @@ namespace YaYaAnnie //By Silva & iPobre
                     predictedHealth > 0
                 select minion)
                 {
-                    Q.CastOnUnit(minion, FarmMenu.Item("useq").GetValue<bool>());
+                    Q.CastOnUnit(minion, FarmMenu.Item("farmq").GetValue<bool>());
                 }
             }
 
-        }
-            }
         }
 
 
