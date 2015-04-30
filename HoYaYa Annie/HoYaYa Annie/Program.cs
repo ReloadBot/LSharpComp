@@ -28,6 +28,7 @@ namespace YaYaAnnie //By Silva & iPobre
         public static Spell R1;
         public static SpellSlot Ignite;
         public static SpellSlot Flash;
+        public static float DoingCombo;
         public static Menu _menu;
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static Obj_AI_Base _Tibbers;
@@ -116,9 +117,11 @@ namespace YaYaAnnie //By Silva & iPobre
             _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
-            _menu.SubMenu("combo").AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
-            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3, 0, 5)));
+            _menu.SubMenu("combo").AddItem(new MenuItem("qcombo", "(Q) Combo").SetValue(true));
+            _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "(W) Combo").SetValue(true));
+            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "(R) Combo").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("flashCombo", "Targets needed to Flash -> R(stun)"))
+                .SetValue(new Slider(4, 5, 1));
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
             _menu.SubMenu("Farm.mode").AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
@@ -141,6 +144,9 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.enabled", "Load Enabled").SetValue(true));
             _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.w", "Cast W").SetValue(true));
             _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.e", "Cast E").SetValue(true));
+
+            _menu.AddSubMenu(new Menu("misc", "misc"));
+            _menu.SubMenu("misc").AddItem(new MenuItem("Pcast", "Package Cast (dont work)").SetValue(false));
 
 
             _menu.AddToMainMenu(); 
@@ -174,10 +180,15 @@ namespace YaYaAnnie //By Silva & iPobre
         private static void Game_OnGameUpdate(EventArgs args)
 
         {
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            var flashRtarget = TargetSelector.GetTarget(900, TargetSelector.DamageType.Magical);
+
             switch (_orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
-                    Combo();
+                    _orbwalker.SetAttack(false);
+                    Combo(target, flashRtarget);
+                    _orbwalker.SetAttack(true);
                     break;
 
                 case Orbwalking.OrbwalkingMode.LaneClear:
@@ -231,49 +242,98 @@ namespace YaYaAnnie //By Silva & iPobre
         }
 
 
-       
-        private static void Combo()
-            {
-                var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
-                var minenemy = _menu.Item("rcombo").GetValue<Slider>().Value;
-                var rtarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-                
-                {
-                    if (_menu.Item("combofull").GetValue<KeyBind>().Active)
-                    {
-                        Q.Cast(target,false,false);
-                        W.Cast(target, false, false);
-                        
-                    }
-                    if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy >= 1) && R.IsReady())
-                    {
-                        R.Cast(rtarget, false,false);
-                    }
-                }
 
-            }
-        private static void FlashCombo()
+    private static void Combo(Obj_AI_Base target, Obj_AI_Base flashRtarget)
+    {
+        if ((target == null && flashRtarget == null) || Environment.TickCount < DoingCombo ||
+            (!Q.IsReady() && !W.IsReady() && !R.IsReady()))
         {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-
-            if (StunCount == 4 && R.IsReady() && Q.IsReady() && W.IsReady() && target != null)
-            {
-
-                if (_menu.Item("FlashCombo").GetValue<bool>() && StunCount == 4 && R.IsReady() && _Tibbers == null)
-                {
-                    ObjectManager.Player.Spellbook.CastSpell(Flash, R1.GetPrediction(target, true).UnitPosition);
-                }
-                R.CastOnUnit(target, false);
-                Q.CastOnUnit(target, false);
-                W.CastOnUnit(target, false);
-                _orbwalker.SetAttack(true);
-                Player.IssueOrder(GameObjectOrder.AutoAttackPet, target);
-
-
-            }
+            return;
         }
 
-        public static bool CastIncendiar(Obj_AI_Base target)
+        var useQ = _menu.Item("qcombo").GetValue<bool>();
+        var useW = _menu.Item("wcombo").GetValue<bool>();
+        var useR = _menu.Item("rcombo").GetValue<bool>();
+        switch (StunCount)
+        {
+            case 3:
+                if (target == null)
+                {
+                    return;
+                }
+                if (Q.IsReady() && useQ)
+                {
+                    DoingCombo = Environment.TickCount;
+                    Q.Cast(target, false, false);
+                    Utility.DelayAction.Add(
+                        (int)(ObjectManager.Player.Distance(target, false) / Q.Speed * 1000 - Game.Ping / 2.0) +
+                        250, () =>
+                        {
+                            if (R.IsReady() &&
+                                !(ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.Health))
+                            {
+                                R.Cast(target, false, true);
+                            }
+                        });
+                }
+                else if (W.IsReady() && useW)
+                {
+                    W.Cast(target);
+                    DoingCombo = Environment.TickCount + 250f;
+                }
+
+                break;
+
+            case 4:
+                if (ObjectManager.Player.Spellbook.CanUseSpell(Flash) == SpellState.Ready && R.IsReady() &&
+                    target == null)
+                {
+                    var position = R1.GetPrediction(flashRtarget, true).CastPosition;
+
+                    if (ObjectManager.Player.Distance(position) > 600 &&
+                        GetEnemiesInRange(flashRtarget.ServerPosition, 250) >=
+                        _menu.Item("flashCombo").GetValue<Slider>().Value)
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(Flash, position);
+                    }
+
+                    Items.UseItem(3128, flashRtarget);
+                    R.Cast(flashRtarget, false, true);
+
+                    if (W.IsReady() && useW)
+                    {
+                        W.Cast(flashRtarget, false, true);
+                    }
+                    else if (Q.IsReady() && useQ)
+                    {
+                        Q.Cast(flashRtarget, _menu.Item("PCast").GetValue<bool>());
+                    }
+                }
+                else if (target != null)
+                {
+                    if (R.IsReady() && useR &&
+                        !(ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) * 0.6 > target.Health))
+                    {
+                        R.Cast(target, false, true);
+                    }
+
+                    if (W.IsReady() && useW)
+                    {
+                        W.Cast(target, false, true);
+                    }
+
+                    if (Q.IsReady() && useQ)
+                    {
+                        Q.Cast(target, _menu.Item("PCast").GetValue<bool>());
+                    }
+                }
+                break;
+
+
+        }
+    }
+
+       public static bool CastIncendiar(Obj_AI_Base target)
         {
             if (target == null) return false;
             int _dmg_Incediar_Base = 50 + (Player.Level * 20);
@@ -310,7 +370,14 @@ namespace YaYaAnnie //By Silva & iPobre
             }
             #endregion
 
-        
+            private static int GetEnemiesInRange(Vector3 pos, float range)
+            {
+                //var Pos = pos;
+                return
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .Where(hero => hero.Team != ObjectManager.Player.Team)
+                        .Count(hero => Vector3.Distance(pos, hero.ServerPosition) <= range);
+            }
 
         
             
