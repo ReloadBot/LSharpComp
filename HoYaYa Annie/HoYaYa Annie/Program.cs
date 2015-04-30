@@ -28,11 +28,9 @@ namespace YaYaAnnie //By Silva & iPobre
         public static Spell R1;
         public static SpellSlot Ignite;
         public static SpellSlot Flash;
-        public static float DoingCombo;
         public static Menu _menu;
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        private static Obj_AI_Base _Tibbers;
-        
+        public static bool HaveStun = false;
 
         #endregion
 
