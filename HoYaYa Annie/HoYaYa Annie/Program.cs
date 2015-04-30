@@ -120,7 +120,6 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
             _menu.SubMenu("combo").AddItem(new MenuItem("qcombo", "Use (Q) in Combo").SetValue(false));
             _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "Use (W) in Combo").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "Use (R) in Combo").SetValue(false));
             _menu.SubMenu("combo").AddItem(new MenuItem("Combo", "Targets needed to R(stun)")).SetValue(new Slider(4, 5, 1));
 
 
@@ -176,10 +175,6 @@ namespace YaYaAnnie //By Silva & iPobre
         private static void Game_OnGameUpdate(EventArgs args)
         {
             
-            
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var flashRtarget = TargetSelector.GetTarget(900, TargetSelector.DamageType.Magical);
-
             switch (_orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
