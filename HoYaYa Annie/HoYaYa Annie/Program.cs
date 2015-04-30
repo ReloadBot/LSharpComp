@@ -244,6 +244,7 @@ namespace YaYaAnnie //By Silva & iPobre
 
        
     private static void Combo(Obj_AI_Base target, Obj_AI_Base flashRtarget)
+
             {
         if ((target == null && flashRtarget == null) || Environment.TickCount < DoingCombo ||
             (!Q.IsReady() && !W.IsReady() && !R.IsReady()))
@@ -254,8 +255,10 @@ namespace YaYaAnnie //By Silva & iPobre
         var useQ = _menu.Item("qcombo").GetValue<bool>();
         var useW = _menu.Item("wcombo").GetValue<bool>();
         var useR = _menu.Item("rcombo").GetValue<bool>();
+       
         switch (StunCount)
-                {
+              
+        {
             case 3:
                 if (target == null)
                 {
@@ -272,6 +275,7 @@ namespace YaYaAnnie //By Silva & iPobre
                             if (R.IsReady() &&
                                 !(ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.Health))
                             {
+                                Q.Cast(target);
                                 R.Cast(target, false, true);
                             }
                         });
