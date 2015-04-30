@@ -267,7 +267,7 @@ namespace YaYaAnnie //By Silva & iPobre
                 if (Q.IsReady() && useQ)
                 {
                     DoingCombo = Environment.TickCount;
-                    Q.Cast(target, false, false);
+                    Q.Cast(target, _menu.Item("PCast").GetValue<bool>());
                     Utility.DelayAction.Add(
                         (int)(ObjectManager.Player.Distance(target, false) / Q.Speed * 1000 - Game.Ping / 2.0) +
                         250, () =>
@@ -275,7 +275,7 @@ namespace YaYaAnnie //By Silva & iPobre
                             if (R.IsReady() &&
                                 !(ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.Health))
                             {
-                                Q.Cast(target);
+                                
                                 R.Cast(target, false, true);
                             }
                         });
@@ -302,7 +302,7 @@ namespace YaYaAnnie //By Silva & iPobre
                     }
 
                     Items.UseItem(3128, flashRtarget);
-                    R.Cast(flashRtarget, false, true);
+                    R.Cast(flashRtarget,false,true);
 
                     if (W.IsReady() && useW)
                     {
