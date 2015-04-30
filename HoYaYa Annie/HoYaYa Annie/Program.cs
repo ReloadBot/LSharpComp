@@ -36,7 +36,7 @@ namespace YaYaAnnie //By Silva & iPobre
 
         #endregion
 
-        #region Buff
+        #region BuffStun
         public static int StunCount
         {
             get
@@ -140,10 +140,11 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
             _menu.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "Drawings on HPBar").SetValue(true));
 
-            _menu.AddSubMenu(new Menu("Passive in Base", "load.fast.stun.base"));
-            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.enabled", "Load Enabled").SetValue(true));
-            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.w", "Cast W").SetValue(true));
-            _menu.SubMenu("load.fast.stun.base").AddItem(new MenuItem("load.fast.cast.e", "Cast E").SetValue(true));
+            _menu.AddSubMenu(new Menu("Stun Charger", "load.fast.stun"));
+            _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("load.fast.enabled", "Load Enabled").SetValue(true));
+            _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("load.fast.base", "Charger in Fountain").SetValue(true));
+            _menu.SubMenu("load.fast.stun.").AddItem(new MenuItem("load.fast.lane", "Charger in Lane").SetValue(true));
+            _menu.SubMenu("load.fast.stun.").AddItem(new MenuItem("LanePassivePercent", "Min Mana % to Charge").SetValue(new Slider(60)));
 
             _menu.AddSubMenu(new Menu("misc", "misc"));
             _menu.SubMenu("misc").AddItem(new MenuItem("Pcast", "Package Cast (dont work)").SetValue(false));
@@ -153,9 +154,6 @@ namespace YaYaAnnie //By Silva & iPobre
 
 
         }
-
-
-
 
             #endregion
 
@@ -173,10 +171,7 @@ namespace YaYaAnnie //By Silva & iPobre
             }
         }
     
-           
-
-
-
+         
         private static void Game_OnGameUpdate(EventArgs args)
 
         {
@@ -195,21 +190,39 @@ namespace YaYaAnnie //By Silva & iPobre
                     LaneClear();
                     break;
             }
-
-            // Passive in Base 
-            if (_menu.Item("load.fast.enabled").GetValue<bool>() && ObjectManager.Player.InFountain() && StunCount != 4)
-            {
-                if (W.IsReady() || E.IsReady())
-                {
-                    if (_menu.Item("load.fast.cast.w").GetValue<bool>()) { W.Cast(Player.Position, false); }
-                    if (_menu.Item("load.fast.cast.e").GetValue<bool>()) { E.Cast(); }
-                }
-            }
-
         }
 
-          
-    public static void LaneClear()
+        private static void ChargeStun()
+        {
+            if (StunCount == 4 || ObjectManager.Player.IsDead || ObjectManager.Player.IsRecalling())
+            {
+                return;
+            }
+
+            if (_menu.Item("load.fast.base").GetValue<bool>() && ObjectManager.Player.InFountain())
+            {
+                if (E.IsReady())
+                {
+                    E.Cast();
+                    return;
+                }
+
+                if (W.IsReady())
+                {
+                    W.Cast(Game.CursorPos);
+                }
+                return;
+            }
+
+            if (_menu.Item("load.fast.lane").GetValue<bool>() && E.IsReady() &&
+                ObjectManager.Player.ManaPercentage() >= _menu.Item("LanePassivePercent").GetValue<Slider>().Value)
+            {
+                E.Cast();
+            }
+        }
+
+        #region Lane Clear Area
+        public static void LaneClear()
         {
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range);
             var jungleMinions = MinionManager.GetMinions(
@@ -220,9 +233,7 @@ namespace YaYaAnnie //By Silva & iPobre
             if (_menu.Item("farmw").GetValue<bool>() && W.IsReady() && minions.Count != 0)
             {
                 W.Cast(W.GetLineFarmLocation(minions).Position);
-            }
-            
-            
+            }                     
             else if (_menu.Item("farmq").GetValue<bool>() && Q.IsReady() && minions.Count >= 0)
             {
                 foreach (var minion in
@@ -240,24 +251,26 @@ namespace YaYaAnnie //By Silva & iPobre
             }
 
         }
+        #endregion
 
+        private static void OrbwalkingBeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            args.Process = Environment.TickCount > DoingCombo;
+        }
 
-       
-    private static void Combo(Obj_AI_Base target, Obj_AI_Base flashRtarget)
-
-            {
+        private static void Combo(Obj_AI_Base target, Obj_AI_Base flashRtarget)
+    {
         if ((target == null && flashRtarget == null) || Environment.TickCount < DoingCombo ||
             (!Q.IsReady() && !W.IsReady() && !R.IsReady()))
         {
             return;
         }
-                
+
         var useQ = _menu.Item("qcombo").GetValue<bool>();
         var useW = _menu.Item("wcombo").GetValue<bool>();
         var useR = _menu.Item("rcombo").GetValue<bool>();
-       
         switch (StunCount)
-              
+
         {
             case 3:
                 if (target == null)
