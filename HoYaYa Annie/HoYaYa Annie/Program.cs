@@ -117,11 +117,11 @@ namespace YaYaAnnie //By Silva & iPobre
             _orbwalker = new Orbwalking.Orbwalker(_menu.SubMenu("orbwalker"));
 
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
-            _menu.SubMenu("combo").AddItem(new MenuItem("qcombo", "(Q) Combo").SetValue(true));
-            _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "(W) Combo").SetValue(true));
-            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "(R) Combo").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("flashCombo", "Targets needed to Flash -> R(stun)"))
-                .SetValue(new Slider(4, 5, 1));
+            _menu.SubMenu("combo").AddItem(new MenuItem("qcombo", "Use (Q) in Combo").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "Use (Q) in Combo").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "Use (Q) in Combo").SetValue(false));
+            _menu.AddItem(new MenuItem("flashCombo", "Targets needed to Flash -> R(stun)")).SetValue(new Slider(4, 5, 1));
+
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
             _menu.SubMenu("Farm.mode").AddItem(new MenuItem("farmq", "Use Q Last Hit").SetValue(false));
@@ -242,20 +242,20 @@ namespace YaYaAnnie //By Silva & iPobre
         }
 
 
-
+       
     private static void Combo(Obj_AI_Base target, Obj_AI_Base flashRtarget)
-    {
+            {
         if ((target == null && flashRtarget == null) || Environment.TickCount < DoingCombo ||
             (!Q.IsReady() && !W.IsReady() && !R.IsReady()))
         {
             return;
         }
-
+                
         var useQ = _menu.Item("qcombo").GetValue<bool>();
         var useW = _menu.Item("wcombo").GetValue<bool>();
         var useR = _menu.Item("rcombo").GetValue<bool>();
         switch (StunCount)
-        {
+                {
             case 3:
                 if (target == null)
                 {
@@ -329,11 +329,24 @@ namespace YaYaAnnie //By Silva & iPobre
                 }
                 break;
 
+            default:
+                if (Q.IsReady() && useQ)
+                {
+                    Q.Cast(target, _menu.Item("PCast").GetValue<bool>());
+                }
 
+                if (W.IsReady() && useW)
+                {
+                    W.Cast(target, false, true);
+                }
+
+                break;
+
+
+            }
         }
-    }
 
-       public static bool CastIncendiar(Obj_AI_Base target)
+        public static bool CastIncendiar(Obj_AI_Base target)
         {
             if (target == null) return false;
             int _dmg_Incediar_Base = 50 + (Player.Level * 20);
