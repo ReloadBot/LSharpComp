@@ -143,8 +143,8 @@ namespace YaYaAnnie //By Silva & iPobre
             _menu.AddSubMenu(new Menu("Stun Charger", "load.fast.stun"));
             _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("load.fast.enabled", "Load Enabled").SetValue(true));
             _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("load.fast.base", "Charger in Fountain").SetValue(true));
-            _menu.SubMenu("load.fast.stun.").AddItem(new MenuItem("load.fast.lane", "Charger in Lane").SetValue(true));
-            _menu.SubMenu("load.fast.stun.").AddItem(new MenuItem("LanePassivePercent", "Min Mana % to Charge").SetValue(new Slider(60)));
+            _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("load.fast.lane", "Charger in Lane").SetValue(true));
+            _menu.SubMenu("load.fast.stun").AddItem(new MenuItem("LanePassivePercent", "Min Mana % to Charge").SetValue(new Slider(60)));
 
             _menu.AddSubMenu(new Menu("misc", "misc"));
             _menu.SubMenu("misc").AddItem(new MenuItem("Pcast", "Package Cast (dont work)").SetValue(false));
