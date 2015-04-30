@@ -117,7 +117,7 @@ namespace YaYaAnnie //By Silva & iPobre
 
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
             _menu.SubMenu("combo").AddItem(new MenuItem("FlashCombo", "Flash To Combo !!").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("SpaceBar".ToCharArray()[0], KeyBindType.Press)));
+            _menu.SubMenu("combo").AddItem(new MenuItem("combofull", "Combo !!").SetValue(new KeyBind("H".ToCharArray()[0], KeyBindType.Press)));
             _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "(R) When ").SetValue(new Slider(3, 0, 5)));
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
@@ -243,9 +243,10 @@ namespace YaYaAnnie //By Silva & iPobre
                     {
                         Q.Cast(target,false,false);
                         W.Cast(target, false, false);
+                        E.Cast(target, false, false);
                         
                     }
-                    if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy >= 1) && R.IsReady())
+                    if (rtarget != null && ObjectManager.Player.Distance(rtarget, false) <= R.Range && (minenemy <= 1) && R.IsReady())
                     {
                         R.Cast(rtarget, false,false);
                     }
