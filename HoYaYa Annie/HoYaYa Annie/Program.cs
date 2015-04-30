@@ -118,9 +118,9 @@ namespace YaYaAnnie //By Silva & iPobre
 
             _menu.AddSubMenu(new Menu("Combo Settings", "combo"));
             _menu.SubMenu("combo").AddItem(new MenuItem("qcombo", "Use (Q) in Combo").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "Use (Q) in Combo").SetValue(false));
-            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "Use (Q) in Combo").SetValue(false));
-            _menu.AddItem(new MenuItem("flashCombo", "Targets needed to Flash -> R(stun)")).SetValue(new Slider(4, 5, 1));
+            _menu.SubMenu("combo").AddItem(new MenuItem("wcombo", "Use (W) in Combo").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("rcombo", "Use (R) in Combo").SetValue(false));
+            _menu.SubMenu("combo").AddItem(new MenuItem("flashCombo", "Targets needed to Flash -> R(stun)")).SetValue(new Slider(4, 5, 1));
 
 
             _menu.AddSubMenu(new Menu("Farming", "Farm.mode"));
